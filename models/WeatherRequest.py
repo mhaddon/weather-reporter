@@ -18,13 +18,13 @@ class WeatherRequest:
 
     def _getGeocodeEndpoint(self) -> str:
         return self._geocodeEndpointTemplate.format(
-            ip=self._getIPRequest().parse()['ip']
+            ip=self._getIPRequest().json().get("ip")
         )
 
     def _getWeatherEndpoint(self) -> str:
         return self._weatherEndpointTemplate.format(
-            lat=self._getGeocodeRequest().parse()['lat'],
-            long=self._getGeocodeRequest().parse()['lon'],
+            lat=self._getGeocodeRequest().json().get("lat"),
+            long=self._getGeocodeRequest().json().get("lon"),
             api_key=Settings.openWeatherMapsAPIKey
         )
 
@@ -53,23 +53,23 @@ class WeatherRequest:
 
     def printLocation(self) -> None:
         print(
-            "Location: ", colored(self._getGeocodeRequest().parse()['city'], "blue"), "-",
-            colored(self._getGeocodeRequest().parse()['country'], "blue"),
+            "Location: ", colored(self._getGeocodeRequest().json().get("city", "Unknown"), "blue"),
+            "-", colored(self._getGeocodeRequest().json().get("country", "Unknown"), "blue"),
             "\t",
             "\t",
             "\t",
-            "IP: ", colored(self._getIPRequest().parse()['ip'], "blue")
+            "IP: ", colored(self._getIPRequest().json().get("ip", "Unknown"), "blue")
         )
 
     def printWeather(self) -> None:
-        temperature: float = float(self._getWeatherRequest().parse()['main']['temp']) - 272.15
-        humidity: int = int(self._getWeatherRequest().parse()['main']['humidity'])
+        temperature: float = float(self._getWeatherRequest().json().get("main", {}).get("temp", 272.15)) - 272.15
+        humidity: int = int(self._getWeatherRequest().json().get("main", {}).get("humidity", 0))
 
         print(
             "Temperature: ", colored("{0:.2f}°C".format(temperature), "blue" if temperature <= 0 else "red"),
             "\t",
             "Weather: ",
-            ', '.join(colored(item['main'], "cyan") for item in self._getWeatherRequest().parse()['weather']),
+            ', '.join(colored(item['main'], "cyan") for item in self._getWeatherRequest().json().get("weather", [])),
             "\t",
             "Humidity: ", colored(str(humidity) + "%", "brown" if humidity <= 50 else "cyan"),
         )

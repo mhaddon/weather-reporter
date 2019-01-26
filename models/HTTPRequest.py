@@ -19,7 +19,7 @@ class HTTPRequest:
                 raise Exception("An error occurred trying to query: %s" % self._url, self.getText())
         return self._contents
 
-    def parse(self) -> JSONObject:
+    def json(self) -> JSONObject:
         if self._parsedJson is None:
             self._parsedJson = self._getContents().json()
         return self._parsedJson
